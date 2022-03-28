@@ -5,38 +5,42 @@
 
 #define MAX 100
 
-char *get_filename_ext(char *filename) {
+char *get_filename_ext(char *filename)
+{
     char *dot = strrchr(filename, '.');
-    if(!dot || dot == filename) return "";
+    if (!dot || dot == filename)
+        return "";
     return dot + 1;
 }
 
 void changeName(int n, char **fileNames, char *newFileName)
 {
-    char *extension = get_filename_ext(fileNames[1]);
-    printf("%s\n", extension);
+    char *extension = (char *)malloc(MAX * sizeof(char));
+    extension = get_filename_ext(fileNames[1]);
+    printf("\n* Files are type of: %s\n\n", extension);
+
+    char temp[100];
+    char counter[100];
     for (int i = 0; i < n; i++)
     {
-        char *temp = malloc(MAX * sizeof(char));
         strcpy(temp, newFileName);
-        
-        char *counter;
-        char buffer[MAX];
 
-        asprintf(&counter, "%d", i);
+        sprintf(counter, "%d", i);
 
         strncat(temp, counter, MAX);
         strncat(temp, ".", 1);
-        strcat(temp, extension);
-        
-        printf("%s\n", (temp));
+        strncat(temp, extension, MAX);
+
+        printf("%s\n", temp);
         rename(fileNames[i], temp);
-    }
+    };
 };
 
 int main()
 {
     char *newFileName = (char *)malloc(MAX * sizeof(char));
+    printf("** FILE RENAMER 1.0\n* All files have to be in the same directory as prog.c file, and all of them have to be the same type!\n");
+    printf("* Enter file name (without extension): ");
     scanf("%s", newFileName);
 
     DIR *d;
@@ -50,11 +54,13 @@ int main()
     {
         while ((dir = readdir(d)) != NULL)
         {
-            // printf("%s\n", dir->d_name);
 
             if (!strcmp(dir->d_name, ".") || !strcmp(dir->d_name, "..") || !strcmp(dir->d_name, "dirent.h") ||
-                !strcmp(dir->d_name, "a.out") || !strcmp(dir->d_name, "prog.c"))
+                !strcmp(dir->d_name, "a.out") || !strcmp(dir->d_name, "prog.c") || !strcmp(dir->d_name, ".gitignore")
+                || !strcmp(dir->d_name, ".git") || !strcmp(dir->d_name, "README.md"))
                 continue;
+
+            // printf("%s\n", dir->d_name);
 
             fileNames[numberOfFiles] = dir->d_name;
             numberOfFiles++;
@@ -63,6 +69,8 @@ int main()
     }
 
     changeName(numberOfFiles, fileNames, newFileName);
+
+    printf("\n* DONE!:)\n");
 
     return 0;
 }
